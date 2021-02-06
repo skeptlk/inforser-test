@@ -2,17 +2,19 @@
 <v-container>
     <v-row>
         <v-col md="6" offset-md="3">
-            <v-btn v-if="!isNew"
-                color="primary"
-                class="float-right">
-                Удалить
-            </v-btn>
-            <v-btn color="primary"> Назад </v-btn>
+            <DeletePoll 
+                v-if="!isNew"
+                :poll="poll" />
+            <router-link to="/" tag="div">
+                <v-btn color="normal"> Назад </v-btn>
+            </router-link>
         </v-col>
     </v-row>
     <v-row>
-        <v-col md="6"
-            offset-md="3">
+        <v-col md="6" offset-md="3">
+            <v-alert v-if="globalError" dense outlined type="error">
+                {{ globalError }}
+            </v-alert>
             <v-text-field
                 v-model="poll.firstname"
                 :error-messages="firstNameErrors"
@@ -32,6 +34,7 @@
             </v-text-field>
 
             <v-text-field
+                v-if="isNew"
                 v-model="poll.email"
                 :error-messages="emailErrors"
                 label="Email"
@@ -41,6 +44,7 @@
             </v-text-field>
 
             <v-text-field
+                v-if="isNew"
                 v-model="poll.password"
                 :error-messages="passwordErrors"
                 label="Пароль" 
@@ -68,7 +72,6 @@
 
             <v-menu
                 :close-on-content-click="false"
-                :nudge-right="40"
                 transition="scale-transition"
                 offset-y
                 min-width="auto">
@@ -93,12 +96,21 @@
                 :error-messages="catPictureErrors"
                 v-model="poll.catPicture"
                 show-size
-                label="Фотография "
+                label="Фотография"
                 truncate-length="40"
                 accept=".jpg, .jpeg"
                 @input="$v.poll.catPicture.$touch()"
                 @blur="$v.poll.catPicture.$touch()">>
             </v-file-input>
+
+            <v-text-field
+                v-if="!isNew"
+                v-model="passwordToEdit"
+                label="Пароль для редактирования опроса" 
+                type="password"
+                @input="$v.poll.password.$touch()"
+                @blur="$v.poll.password.$touch()">
+            </v-text-field>
 
             <v-btn
                 :loading="loading"
@@ -116,6 +128,7 @@
 </template>
 
 <script>
+import DeletePoll from './DeletePoll';
 import { validationMixin } from 'vuelidate';
 import { required, minLength, email } from 'vuelidate/lib/validators';
 
@@ -127,11 +140,14 @@ import { maxFileSize, allowedExtensions } from './../helpers/validators';
 export default {
     name: 'SinglePoll',
     mixins: [validationMixin],
+    components: { DeletePoll },
 
     data() { 
         return {
             isNew : true,
             loading : false,
+            globalError: '',
+            passwordToEdit: '',
             poll: {}
         }
     },
@@ -201,14 +217,29 @@ export default {
     methods: {
         submit () {
             this.$v.$touch();
-            this.loading = true;
-            const action = (this.isNew) ? "createPoll" : "updatePoll";
-            this.$store
-                .dispatch(action, this.poll)
-                .then(() => {
-                    this.loading = false;
-                    this.$router.push('/');
-                });
+
+            console.log(this.$v);
+
+            if (!this.$v.invalid) {
+                this.loading = true;
+                const action = (this.isNew) ? "createPoll" : "updatePoll";
+                const data = (this.isNew) ? this.poll : { poll: this.poll, password: this.passwordToEdit };
+                this.$store
+                    .dispatch(action, data)
+                    .then(() => {
+                        this.loading = false;
+                        this.$router.push('/');
+                    })
+                    .catch((err) => {
+                        this.loading = false;
+                        if (err === "Incorrect password") {
+                            this.globalError = "Неверный пароль";
+                        } else if (err === "Duplicate email") {
+                            this.globalError = "Опрос по такому адресу уже существует. Введите пароль чтобы отредактировать.";
+                            this.isNew = false;
+                        }
+                    }); 
+            }
         },
     },
 

@@ -16,7 +16,7 @@ const store = new Vuex.Store({
                 birthdate: "2000-07-25",
                 catPicture: null,
                 email: "test@abc.ru",
-                password: "pass"
+                password: "mypassword"
             }, {
                 firstname: "Normal",
                 lastname: "Guy",
@@ -25,6 +25,14 @@ const store = new Vuex.Store({
                 catPicture: null,
                 email: "normal.guy@mail.com",
                 password: "password"
+            }, {
+                firstname: "Аноним",
+                lastname: "Анонимович",
+                likesKittens: false,
+                birthdate: "1900-1-1",
+                catPicture: null,
+                email: "another@person.qq",
+                password: "revesksnayrb"
             },
         ],
         loading: false

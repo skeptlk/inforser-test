@@ -1,15 +1,6 @@
 
 export default {
 
-
-    START_LOADING (state) {
-        state.loading = true;
-    },
-
-    STOP_LOADING (state) {
-        state.loading = false;
-    },
-
     CREATE_POLL (state, poll) {
         state.polls = [...state.polls, poll];
     },
