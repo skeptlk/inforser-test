@@ -5,13 +5,12 @@ export default {
         return new Promise ((resolve, reject) => {
             commit('START_LOADING');
     
-            const url = `${state.host}/posts/${poll.email}`;
+            const url = `${state.host}/posts/1`;
             const method = 'PUT';
-            const data = JSON.stringify(poll);
-            const mode = 'no-cors';
+            const body = JSON.stringify(poll);
             
             // fake request
-            fetch(url, { method, mode, data })
+            fetch(url, { method, body })
                 .then(res => res.json(), err => reject(err))
                 .then(() => {
                     commit('UPDATE_POLL', poll);
@@ -24,13 +23,13 @@ export default {
         return new Promise ((resolve, reject) => {
             commit('START_LOADING');
     
-            const url = `${state.host}/posts/${poll.email}`;
+            const url = `${state.host}/posts`;
             const method = 'POST';
-            const data = JSON.stringify(poll);
+            const body = JSON.stringify(poll);
             const mode = 'no-cors';
             
             // fake request
-            fetch(url, { method, mode, data })
+            fetch(url, { method, mode, body })
                 .then(res => res.json(), err => reject(err))
                 .then(() => {
                     commit('CREATE_POLL', poll);

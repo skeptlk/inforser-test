@@ -1,7 +1,6 @@
 
 export default class PollData {
     constructor () {
-        this.id = -1;
         this.firstname = "";
         this.lastname = "";
         this.likesKittens = true;
@@ -10,4 +9,4 @@ export default class PollData {
         this.email = "";
         this.password = "";
     }
-};
+}
